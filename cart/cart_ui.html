@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wellth Cart</title>
+
+    <!-- Load Quicksand font -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    @font-face {
+      font-family: 'TT Commons';
+      src: url('https://jabedamin.github.io/fonts/tt-commons/TTCommons-Regular.woff') format('woff');
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: white;
+      margin: 0;
+      color: #0a1d2a;
+    }
+
+    #cartContainer {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .cart-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    #cartItemsContainer {
+      margin-bottom: 20px;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+
+    .cart-item div {
+      flex: 1;
+    }
+
+    .cart-item button {
+      background: #0a1d2a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      margin: 0 2px;
+      cursor: pointer;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+
+    .summary-line.total {
+      font-weight: 600;
+    }
+
+    #checkoutButton {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(90deg, #d41472, #00efd2);
+      border: none;
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    #upgradeBanner, #monthlyBanner {
+      background: #f5f5f5;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      text-align: center;
+    }
+
+    #upgradeButton {
+      margin-top: 5px;
+      background: #0a1d2a;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .highlight {
+      color: #d41472;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div id="cartContainer">
+    <h2 class="cart-title">Your Cart</h2>
+
+    <div id="cartItemsContainer">
+      <!-- Dynamic cart items will be inserted here -->
+      <p id="emptyCartMessage">Your cart is empty</p>
+    </div>
+
+    <div id="upgradeBanner" class="hidden">
+      <p>Upgrade to monthly and <span class="highlight">save 22%</span></p>
+      <button id="upgradeButton">Upgrade</button>
+    </div>
+
+    <div id="monthlyBanner" class="hidden">
+      <p>Flexible monthly subscription, cancel anytime!</p>
+    </div>
+
+    <div id="summaryContainer">
+      <div class="summary-line">
+        <span>Savings</span>
+        <span id="savingsAmount">-£0.00</span>
+      </div>
+      <div class="summary-line">
+        <span>Shipping</span>
+        <span id="shippingAmount">£0.00</span>
+      </div>
+      <div class="summary-line total">
+        <span>Subtotal</span>
+        <span id="subtotalAmount">£0.00</span>
+      </div>
+      <button id="checkoutButton">CHECKOUT SECURELY</button>
+    </div>
+  </div>
+
+  <script>
+    let cartData = {
+      items: [],
+      deliveryFee: 2.99,
+      savings: 0
+    };
+
+    function getFlavorColor(flavor) {
+      switch (flavor) {
+        case "Sour Watermelon": return "#d41472";
+        case "Blue Raspberry": return "#005b95";
+        case "Mango + Pineapple": return "#d48114";
+        default: return "#000";
+      }
+    }
+
+    function renderCart() {
+      const container = document.getElementById("cartItemsContainer");
+      container.innerHTML = "";
+
+      if (cartData.items.length === 0) {
+        document.getElementById("emptyCartMessage").style.display = "block";
+        document.getElementById("upgradeBanner").classList.add("hidden");
+        document.getElementById("monthlyBanner").classList.add("hidden");
+        updateSummary();
+        return;
+      }
+
+      document.getElementById("emptyCartMessage").style.display = "none";
+
+      cartData.items.forEach((item, index) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "cart-item";
+        itemDiv.innerHTML = `
+          <div>
+            ${item.name} <br />
+            <span style="color:${getFlavorColor(item.flavor)}">${item.flavor}</span>
+          </div>
+          <div>£${(item.pricePerUnit * item.quantity).toFixed(2)}</div>
+          <div>
+            <button onclick="decreaseQuantity(${index})">-</button>
+            ${item.quantity}
+            <button onclick="increaseQuantity(${index})">+</button>
+            <button onclick="deleteItem(${index})">x</button>
+          </div>
+        `;
+        container.appendChild(itemDiv);
+      });
+
+      updateSummary();
+    }
+
+    function increaseQuantity(index) {
+      cartData.items[index].quantity += 1;
+      renderCart();
+    }
+
+    function decreaseQuantity(index) {
+      if (cartData.items[index].quantity > 1) {
+        cartData.items[index].quantity -= 1;
+        renderCart();
+      }
+    }
+
+    function deleteItem(index) {
+      cartData.items.splice(index, 1);
+      renderCart();
+    }
+
+    function updateSummary() {
+      // Example logic - calculate delivery fee
+      let totalQuantity = cartData.items.reduce((sum, item) => sum + item.quantity, 0);
+      cartData.deliveryFee = totalQuantity > 2 ? 2.99 + Math.floor((totalQuantity - 2) / 2) * 1 : 2.99;
+      document.getElementById("shippingAmount").textContent = `£${cartData.deliveryFee.toFixed(2)}`;
+
+      // Example: update subtotal
+      let subtotal = cartData.items.reduce((sum, item) => sum + item.quantity * item.pricePerUnit, 0) + cartData.deliveryFee;
+      document.getElementById("subtotalAmount").textContent = `£${subtotal.toFixed(2)}`;
+
+      // Update savings (placeholder logic)
+      document.getElementById("savingsAmount").textContent = `-£${cartData.savings.toFixed(2)}`;
+    }
+
+    document.getElementById("checkoutButton").addEventListener("click", () => {
+      window.parent.postMessage({ cartCheckout: cartData }, "*");
+    });
+
+    document.getElementById("upgradeButton").addEventListener("click", () => {
+      // Example logic: swap to monthly plan
+      cartData.items = [{
+        name: "Creatine Monohydrate Gummies",
+        flavor: cartData.items[0].flavor,
+        purchaseType: "Monthly",
+        quantity: 1,
+        pricePerUnit: 17.99
+      }];
+      cartData.deliveryFee = 0;
+      cartData.savings = 5.99;
+      document.getElementById("upgradeBanner").classList.add("hidden");
+      document.getElementById("monthlyBanner").classList.remove("hidden");
+      renderCart();
+    });
+
+    // Example: receive data from Wix
+    window.addEventListener("message", (event) => {
+      if (event.data.flavor && event.data.purchaseType) {
+        cartData.items.push({
+          name: "Creatine Monohydrate Gummies",
+          flavor: event.data.flavor,
+          purchaseType: event.data.purchaseType,
+          quantity: 1,
+          pricePerUnit: event.data.purchaseType === "Monthly" ? 17.99 : 19.99
+        });
+        renderCart();
+      }
+    });
+
+    renderCart();
+  </script>
+</body>
+</html>
