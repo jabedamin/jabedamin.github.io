@@ -19,30 +19,30 @@
   #cartContainer {
     width: 100%;
     max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    height: 100vh;
     box-sizing: border-box;
+    padding: 0 15px 15px 15px; /* top: 0 for flush header, bottom: 15px */
   }
 
   .separator {
     height: 4px;
     background: linear-gradient(90deg, #d41472, #00efd2);
-    margin: 10px 0;
     border-radius: 2px;
+    margin: 0; /* remove margin */
   }
 
   .separator-thin {
     height: 1px;
     background: linear-gradient(90deg, #d41472, #00efd2);
-    margin: 10px 0;
     border-radius: 1px;
+    margin: 10px 0 0 0;
   }
 
   #cartItemsContainer {
-    margin-bottom: 20px;
+    flex: 1;
+    margin-top: 10px;
   }
 
   .cart-item {
@@ -79,7 +79,8 @@
   }
 
   #checkoutButton {
-    width: 100%;
+    width: calc(100% - 30px); /* fill width with 15px margin on each side */
+    margin: 10px auto 0 auto;
     padding: 15px;
     background: linear-gradient(90deg, #d41472, #00efd2);
     border: none;
@@ -88,7 +89,6 @@
     font-weight: 600;
     border-radius: 8px;
     cursor: pointer;
-    margin-top: 10px;
   }
 
   #upgradeBanner, #monthlyBanner {
@@ -124,7 +124,7 @@
 
   @media (max-width: 600px) {
     #cartContainer {
-      padding: 10px;
+      padding: 0 10px 10px 10px;
     }
 
     .cart-item button {
@@ -135,13 +135,14 @@
     #checkoutButton {
       font-size: 14px;
       padding: 12px;
+      width: calc(100% - 20px);
     }
   }
 </style>
 </head>
 <body>
   <div id="cartContainer">
-    <!-- Gradient line below header (assumed Wix header is outside iframe) -->
+    <!-- Gradient line below header (flush with top) -->
     <div class="separator"></div>
 
     <div id="cartItemsContainer">
@@ -157,7 +158,7 @@
       <p>Flexible monthly subscription, cancel anytime!</p>
     </div>
 
-    <!-- If cart is empty, show bottom gradient separator -->
+    <!-- Bottom separator only if cart empty -->
     <div id="emptyCartSeparator" class="separator-thin hidden"></div>
 
     <div id="summaryContainer">
